@@ -1,5 +1,8 @@
 import { Server } from 'azle';
+import { ethers } from 'ethers';
 import express from 'express';
+import abi from "../../abi.json";
+import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 
 interface FarcasterMessage {
     untrustedData: {
@@ -24,40 +27,88 @@ export default Server(() => {
 
     app.use(express.json());
 
-    app.post('/action', (req, res) => {
+    app.post('/action', async (req, res) => {
         const body = req.body as FarcasterMessage;
+        
         const buttonChosen = body.untrustedData.buttonIndex;
         let buttonTexts = [
             'Button 1'
         ];
         buttonTexts[buttonChosen - 1] = '**' + buttonTexts[buttonChosen - 1] + '**';
+
+        const startTime = new Date();
+        const response = await fetch('https://api.neynar.com/v2/farcaster/frame/validate', {
+            method: 'POST',
+            headers: {
+                accept: 'application/json',
+                api_key: 'xxx',
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                cast_reaction_context: true,
+                follow_context: false,
+                signer_context: false,
+                message_bytes_in_hex: body.trustedData.messageBytes
+            })
+        });
+        const endTime1 = new Date();
+        const duration1 = endTime1.getTime() - startTime.getTime();
+        console.log(`Fetch call duration: ${duration1} ms`);
         
-        // const schemaEncoder = new SchemaEncoder("bool metIRL");
-        // const encoded = schemaEncoder.encodeData([
-        //     { name: "metIRL", type: "bool", value: true },
-        // ]);
+        const endTime2 = new Date();
+        const { action: { interactor: { fid, verified_addresses: { eth_addresses } } } } = await response.json();
+        const duration2 = endTime2.getTime() - endTime1.getTime();
+        console.log(`Fetch call duration: ${duration2} ms`);
         
-        // invariant(signer, "signer must be defined");
-        // eas.connect(signer);
+        console.log('fid', fid);
+        console.log('eth_addresses', eth_addresses[1]);
 
-        // const recipient = ensResolvedAddress
-        //     ? ensResolvedAddress
-        //     : address;
+        
+        const wallet = new ethers.Wallet(
+            "xxx",
+            ethers.getDefaultProvider('https://sepolia.base.org') // chainId: "eip155:84532",
+        );
 
-        // const tx = await eas.attest({
-        //     data: {
-        //     recipient: recipient,
-        //     data: encoded,
-        //     refUID: ethers.ZeroHash,
-        //     revocable: true,
-        //     expirationTime: BigInt(0),
-        //     },
-        //     schema: CUSTOM_SCHEMAS.MET_IRL_SCHEMA,
-        // });
+        console.log(`Wallet: ${wallet.address}`);
 
-        // const uid = await tx.wait();
+        const schemaEncoder = new SchemaEncoder("uint32 fid,uint64 timestamp");
 
-        // const attestation = await getAttestation(uid);
+        const encoded = schemaEncoder.encodeData([
+          { name: "fid", type: "uint32", value: fid },
+          { name: "timestamp", type: "uint64", value: Date.now() },
+        ]);
+
+        console.log(`encoded: ${encoded}`);
+
+        try {
+            const info = {
+                schema: "0xca168d038c5d527bb9724b3201f026520b498d334a2f3f446181d6420d7fb515",
+                data: {
+                    recipient: eth_addresses[1],
+                    data: encoded,
+                    expirationTime: BigInt(0),
+                    revocable: false,
+                    refUID: ethers.ZeroHash,
+                    value: BigInt(0)
+                }
+            };
+            
+            console.log(`info`, info.data.refUID);
+    
+            const contract = new ethers.Contract("0x4200000000000000000000000000000000000021", abi.abi, wallet);
+    
+            const tx = await contract.attest(info);
+    
+            console.log(`tx: ${tx}`);
+    
+            // Wait for the transaction to be mined
+            await tx.wait();
+    
+            console.log(`Transaction sent with hash: ${tx.hash}`);
+        } catch (err) {
+            console.log(err);
+        }
+        
 
         res.send(pageFromTemplate(
             'https://raw.githubusercontent.com/vrypan/farcaster-brand/main/icons/icon-rounded/purple-white.png',
