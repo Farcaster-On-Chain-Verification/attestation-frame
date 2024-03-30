@@ -1,4 +1,4 @@
-import { Server } from 'azle';
+import { Server, jsonStringify } from 'azle';
 import { ethers } from 'ethers';
 import express from 'express';
 import abi from "../../abi.json";
@@ -55,7 +55,6 @@ export default Server(() => {
         ];
         buttonTexts[buttonChosen - 1] = '**' + buttonTexts[buttonChosen - 1] + '**';
 
-        const startTime = new Date();
         const response = await fetch('https://api.neynar.com/v2/farcaster/frame/validate', {
             method: 'POST',
             headers: {
@@ -63,24 +62,23 @@ export default Server(() => {
                 api_key: NEYNAR_API_KEY,
                 'content-type': 'application/json'
             },
-            body: JSON.stringify({
+            body: jsonStringify({
                 cast_reaction_context: true,
-                follow_context: false,
-                signer_context: false,
+                follow_context: true,
+                signer_context: true,
                 message_bytes_in_hex: body.trustedData.messageBytes
             })
         });
-        const endTime1 = new Date();
-        const duration1 = endTime1.getTime() - startTime.getTime();
-        console.log(`Fetch call duration: ${duration1} ms`);
         
-        const endTime2 = new Date();
-        const { action: { interactor: { fid, verified_addresses: { eth_addresses } } } } = await response.json();
-        const duration2 = endTime2.getTime() - endTime1.getTime();
-        console.log(`Fetch call duration: ${duration2} ms`);
-        
+        const trustedData = await response.json();
+        const { action: { interactor: { fid, verified_addresses: { eth_addresses } } } } = trustedData;
+
         console.log('fid', fid);
         console.log('eth_addresses', eth_addresses[1]);
+
+        // Let the user choose which wallet to use
+
+        // Recast and follow
 
         const wallet = new ethers.Wallet(
             FARCASTER_ATTESTOR,
@@ -114,24 +112,88 @@ export default Server(() => {
 
         const contract = new ethers.Contract("0x4200000000000000000000000000000000000021", abi.abi, wallet);
 
-        const attestInit = new Date();
         const tx = await contract.attest(info);
-        const attestEnd = new Date();
-        const attestDuration = attestInit.getTime() - attestEnd.getTime();
-        console.log(`Attest duration: ${attestDuration} ms`);
-
-        const transactionMinedInit = new Date();
-        await tx.wait();
-        const transactionMinedEnd = new Date();
-        const transactionMinedDuration = transactionMinedInit.getTime() - transactionMinedEnd.getTime();
-        console.log(`transactionMined duration: ${transactionMinedDuration} ms`);
 
         console.log(`Transaction sent with hash: ${tx.hash}`);
+
+        const receipt = await tx.wait();
+
+        const uid = receipt.logs[0].data;
+
+        console.log(`uid`, uid);
     });
 
     app.post('/refresh', async (req, res) => {
-        res.send(finalFrame(
+        console.log('refresh');
+
+        const body = req.body as FarcasterMessage;
+
+        const response = await fetch('https://api.neynar.com/v2/farcaster/frame/validate', {
+            method: 'POST',
+            headers: {
+                accept: 'application/json',
+                api_key: NEYNAR_API_KEY,
+                'content-type': 'application/json'
+            },
+            body: jsonStringify({
+                cast_reaction_context: true,
+                follow_context: true,
+                signer_context: true,
+                message_bytes_in_hex: body.trustedData.messageBytes
+            })
+        });
+        
+        const trustedData = await response.json();
+        const { action: { interactor: { fid, verified_addresses: { eth_addresses } } } } = trustedData;
+
+        console.log('fid', fid);
+        console.log('eth_addresses', eth_addresses[1]);
+
+        // const response = await fetch("https://base-sepolia.easscan.org/graphql", {
+        //     method: 'POST',
+        //     headers: {
+        //         accept: 'application/json',
+        //         'content-type': 'application/json'
+        //     },
+        //     body: jsonStringify({
+        //         query: 'query Attestations($where: AttestationWhereInput, $orderBy: [AttestationOrderByWithRelationInput!]) {\n  attestations(where: $where, orderBy: $orderBy) {\n    attester\n    revocationTime\n    expirationTime\n    time\n    recipient\n    id\n    data\n  }\n}',
+        //         variables: {
+        //             where: {
+        //                 schemaId: {
+        //                     equals: '0xca168d038c5d527bb9724b3201f026520b498d334a2f3f446181d6420d7fb515',
+        //                 },
+        //                 OR: [
+        //                     {
+        //                     attester: {
+        //                         equals: '0x372082138ea420eBe56078D73F0359D686A7E981',
+        //                     },
+        //                     },
+        //                     {
+        //                     recipient: {
+        //                         equals: '0x372082138ea420eBe56078D73F0359D686A7E981',
+        //                     },
+        //                     },
+        //                 ],
+        //             },
+        //             orderBy: [
+        //                 {
+        //                     time: "desc",
+        //                 },
+        //             ],
+        //         },
+        //     })
+        // });
+        
+        // console.log('response');
+
+        // const { data: { attestations } } = await response.json();
+
+        // console.log('attestations', attestations);
+
+        res.send(pageWithLinkFromTemplate(
             'https://ipfs.io/ipfs/QmeJ7JRpo15yGHjPj6bjxdda1y96GEctLUXNkTTtX8MUMT',
+            'See Attestation on EAS',
+            `https://base-sepolia.easscan.org/address/${eth_addresses[1]}`,  // `https://base-sepolia.easscan.org/attestation/view/${attestation.id}`,
             mainPageBody
         ))
     })
@@ -173,6 +235,36 @@ let pageFromTemplate = (
     <meta property='fc:frame:image' content='${imageUrl}' />
     <meta property='fc:frame:button:1' content='${button1Text}' />
     <meta property='fc:frame:post_url' content='${apiUrl}' />
+    <meta property='og:title' content='Azle farcaster frame' />
+    <meta property='og:image' content='${imageUrl}' />
+    <title>Azle farcaster frame</title>
+</head>
+
+<body>
+    ${body}
+</body>
+
+</html>
+`;
+
+let pageWithLinkFromTemplate = (
+    imageUrl: string,
+    button1Text: string,
+    apiUrl: string,
+    body: string
+) => `
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='utf-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+    <meta name='next-size-adjust' />
+    <meta property='fc:frame' content='vNext' />
+    <meta property='fc:frame:image' content='${imageUrl}' />
+    <meta property='fc:frame:button:1' content='${button1Text}' />
+    <meta property='fc:frame:button:1:action' content='link' />
+    <meta property='fc:frame:button:1:target' content='${apiUrl}' />
     <meta property='og:title' content='Azle farcaster frame' />
     <meta property='og:image' content='${imageUrl}' />
     <title>Azle farcaster frame</title>
