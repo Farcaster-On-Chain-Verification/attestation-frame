@@ -27,6 +27,8 @@ export default Server(() => {
 
     const NEYNAR_API_KEY = 'xxx';
     const FARCASTER_ATTESTOR = 'xxx';
+    const DOMAIN = 'https://she77-3iaaa-aaaap-ag7ba-cai.raw.icp0.io';
+    // const DOMAIN = 'https://f4ba-186-55-232-157.ngrok-free.app';
 
     app.use(express.json());
 
@@ -34,7 +36,7 @@ export default Server(() => {
         res.send(pageFromTemplate(
             'https://ipfs.io/ipfs/QmUF9BmteniwSsLco3XaYVGbpdh3FWuUW8CqbDP52azE65',
             'Attest',
-            'https://4c8a-186-55-232-157.ngrok-free.app/action',
+            `${DOMAIN}/action`,
             mainPageBody
         ))
     });
@@ -43,18 +45,12 @@ export default Server(() => {
         res.send(pageFromTemplate(
             'https://ipfs.io/ipfs/QmawGYH6TdvxsC1zhMXtAPJcjy7R5yCMQ6SBmUrwGD5pNE',
             'Refresh',
-            'https://4c8a-186-55-232-157.ngrok-free.app/refresh',
+            `${DOMAIN}/refresh`,
             mainPageBody
         ))
 
         const body = req.body as FarcasterMessage;
         
-        const buttonChosen = body.untrustedData.buttonIndex;
-        let buttonTexts = [
-            'Button 1'
-        ];
-        buttonTexts[buttonChosen - 1] = '**' + buttonTexts[buttonChosen - 1] + '**';
-
         const response = await fetch('https://api.neynar.com/v2/farcaster/frame/validate', {
             method: 'POST',
             headers: {
@@ -107,8 +103,6 @@ export default Server(() => {
                 value: BigInt(0)
             }
         };
-        
-        console.log(`info`, info.data.refUID);
 
         const contract = new ethers.Contract("0x4200000000000000000000000000000000000021", abi.abi, wallet);
 
