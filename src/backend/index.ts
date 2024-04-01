@@ -1,28 +1,9 @@
-import { ic, Server, jsonStringify } from 'azle';
+import { Server, jsonStringify } from 'azle';
 import express from 'express';
-
-interface FarcasterMessage {
-    untrustedData: {
-        fid: number;
-        url: string;
-        messageHash: string;
-        timestamp: number;
-        network: number;
-        buttonIndex: number;
-        castId: {
-            fid: number;
-            hash: string;
-        };
-    };
-    trustedData: {
-        messageBytes: string;
-    };
-}
 
 export default Server(() => {
     const app = express();
 
-    const NEYNAR_API_KEY = 'xxx';
     const SERVER = 'https://attest-theta.vercel.app';
 
     app.use(express.json());
@@ -40,33 +21,13 @@ export default Server(() => {
         console.log('refresh');
 
         try {
-
-            ic.setOutgoingHttpOptions({
-                cycles: 20852722800n
-            });
-
-            const body = req.body as FarcasterMessage;
-
-            const response = await fetch('https://api.neynar.com/v2/farcaster/frame/validate', {
-                method: 'POST',
-                headers: {
-                    accept: 'application/json',
-                    api_key: NEYNAR_API_KEY,
-                    'content-type': 'application/json'
-                },
-                body: jsonStringify({
-                    cast_reaction_context: true,
-                    follow_context: true,
-                    signer_context: true,
-                    message_bytes_in_hex: body.trustedData.messageBytes
-                })
-            });
+            const address = req.query.address;
             
-            const trustedData = await response.json();
-            const { action: { interactor: { fid, verified_addresses: { eth_addresses } } } } = trustedData;
+            console.log('address', address);
 
-            console.log('fid', fid);
-            console.log('eth_addresses', eth_addresses[1]);
+            // const uid = req.query.uid;
+            
+            // console.log('uid', uid);
 
             // const response = await fetch("https://base-sepolia.easscan.org/graphql", {
             //     method: 'POST',
@@ -112,7 +73,8 @@ export default Server(() => {
             res.send(pageWithLinkFromTemplate(
                 'https://ipfs.io/ipfs/QmeJ7JRpo15yGHjPj6bjxdda1y96GEctLUXNkTTtX8MUMT',
                 'See Attestation on EAS',
-                `https://base-sepolia.easscan.org/address/${eth_addresses[1]}`,  // `https://base-sepolia.easscan.org/attestation/view/${attestation.id}`,
+                `https://base-sepolia.easscan.org/address/${address}`,
+                // `https://base-sepolia.easscan.org/attestation/view/${uid}`,
                 mainPageBody
             ))
 
