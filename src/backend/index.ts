@@ -1,62 +1,59 @@
-import { Server } from 'azle';
 import express from 'express';
 
-export default Server(() => {
-    const app = express();
+const app = express();
 
-    const SERVER = 'https://attest-theta.vercel.app';
+const ATTEST_SERVER = 'https://attest-theta.vercel.app';
 
-    app.use(express.json());
+app.use(express.json());
 
-    app.get('/', (req, res) => {
-        res.send(pageFromTemplate(
-            'https://ipfs.io/ipfs/QmUF9BmteniwSsLco3XaYVGbpdh3FWuUW8CqbDP52azE65',
-            'Attest',
-            `${SERVER}/api/action`,
+app.get('/', (req, res) => {
+    res.send(pageFromTemplate(
+        'https://ipfs.io/ipfs/QmUF9BmteniwSsLco3XaYVGbpdh3FWuUW8CqbDP52azE65',
+        'Attest',
+        `${ATTEST_SERVER}/api/action`,
+        mainPageBody
+    ))
+});
+
+app.post('/refresh', async (req, res) => {
+    console.log('refresh');
+
+    try {
+        const address = req.query.address;
+        
+        console.log('address', address);
+
+        // const uid = req.query.uid;
+        
+        // console.log('uid', uid);
+
+        res.send(pageWithLinkFromTemplate(
+            'https://ipfs.io/ipfs/QmeJ7JRpo15yGHjPj6bjxdda1y96GEctLUXNkTTtX8MUMT',
+            'See Attestation on EAS',
+            `https://base-sepolia.easscan.org/address/${address}`,
+            // `https://base-sepolia.easscan.org/attestation/view/${uid}`,
             mainPageBody
         ))
-    });
 
-    app.post('/refresh', async (req, res) => {
-        console.log('refresh');
-
-        try {
-            const address = req.query.address;
-            
-            console.log('address', address);
-
-            // const uid = req.query.uid;
-            
-            // console.log('uid', uid);
-
-            res.send(pageWithLinkFromTemplate(
-                'https://ipfs.io/ipfs/QmeJ7JRpo15yGHjPj6bjxdda1y96GEctLUXNkTTtX8MUMT',
-                'See Attestation on EAS',
-                `https://base-sepolia.easscan.org/address/${address}`,
-                // `https://base-sepolia.easscan.org/attestation/view/${uid}`,
-                mainPageBody
-            ))
-
-        } catch (err) {
-          let message = '';
-          if (typeof err === "string") {
-            message = err;
-          } else if (err instanceof Error) {
-            message = err.message;
-          }
-      
-          res.send(pageFromTemplate(
-            'https://ipfs.io/ipfs/QmawGYH6TdvxsC1zhMXtAPJcjy7R5yCMQ6SBmUrwGD5pNE',
-            message,
-            `https://s3afo-miaaa-aaaap-ag7da-cai.raw.icp0.io/refresh`,
-            mainPageBody
-          ))
-
+    } catch (err) {
+        let message = '';
+        if (typeof err === "string") {
+        message = err;
+        } else if (err instanceof Error) {
+        message = err.message;
         }
-    })
+    
+        res.send(pageFromTemplate(
+        'https://ipfs.io/ipfs/QmawGYH6TdvxsC1zhMXtAPJcjy7R5yCMQ6SBmUrwGD5pNE',
+        message,
+        `https://s3afo-miaaa-aaaap-ag7da-cai.raw.icp0.io/refresh`,
+        mainPageBody
+        ))
 
-    return app.listen();
-});
+    }
+})
+
+app.listen();
 
 const mainPageBody = `
 <div>

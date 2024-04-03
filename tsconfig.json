@@ -7,7 +7,6 @@
         "outDir": "HACK_BECAUSE_OF_ALLOW_JS",
         "allowSyntheticDefaultImports": true,
         "experimentalDecorators": true,
-        "module": "ES2020",
-        "resolveJsonModule": true,
+        "module": "ES2020"
     }
 }
