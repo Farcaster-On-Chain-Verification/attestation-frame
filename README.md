@@ -1,8 +1,6 @@
-# Attestation Farcaster Frame
+# attestation-farcaster-frame
 
-## Description
-
-Attestation Farcaster Frame is a frontend solution for secure Farcaster account attestation through Ethereum's Attestation Service on Arbitrum One. It uses Azle to craft a user-friendly interface enhancing Sybil resistance for platforms like Gitcoin Passport, ensuring reliable identity verification.
+Attest to Farcaster wiFacilitate Farcaster account attestation through Ethereum's Attestation Service on Arbitrum One using Azle with Vercel Serverless Functions in a React environment.
 
 ## Motivation
 
