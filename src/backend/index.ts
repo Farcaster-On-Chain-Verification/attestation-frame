@@ -1,4 +1,4 @@
-import { Server, jsonStringify } from 'azle';
+import { Server } from 'azle';
 import express from 'express';
 
 export default Server(() => {
@@ -28,47 +28,6 @@ export default Server(() => {
             // const uid = req.query.uid;
             
             // console.log('uid', uid);
-
-            // const response = await fetch("https://base-sepolia.easscan.org/graphql", {
-            //     method: 'POST',
-            //     headers: {
-            //         accept: 'application/json',
-            //         'content-type': 'application/json'
-            //     },
-            //     body: jsonStringify({
-            //         query: 'query Attestations($where: AttestationWhereInput, $orderBy: [AttestationOrderByWithRelationInput!]) {\n  attestations(where: $where, orderBy: $orderBy) {\n    attester\n    revocationTime\n    expirationTime\n    time\n    recipient\n    id\n    data\n  }\n}',
-            //         variables: {
-            //             where: {
-            //                 schemaId: {
-            //                     equals: '0xca168d038c5d527bb9724b3201f026520b498d334a2f3f446181d6420d7fb515',
-            //                 },
-            //                 OR: [
-            //                     {
-            //                     attester: {
-            //                         equals: '0x372082138ea420eBe56078D73F0359D686A7E981',
-            //                     },
-            //                     },
-            //                     {
-            //                     recipient: {
-            //                         equals: '0x372082138ea420eBe56078D73F0359D686A7E981',
-            //                     },
-            //                     },
-            //                 ],
-            //             },
-            //             orderBy: [
-            //                 {
-            //                     time: "desc",
-            //                 },
-            //             ],
-            //         },
-            //     })
-            // });
-            
-            // console.log('response');
-
-            // const { data: { attestations } } = await response.json();
-
-            // console.log('attestations', attestations);
 
             res.send(pageWithLinkFromTemplate(
                 'https://ipfs.io/ipfs/QmeJ7JRpo15yGHjPj6bjxdda1y96GEctLUXNkTTtX8MUMT',
