@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from 'express';
 
 const app = express();
 
@@ -8,33 +8,89 @@ const GITCOIN_PASSPORT_URL = "https://passport.gonzalomelov.xyz";
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send(
-    pageFromTemplate(
-      "https://farcaster-on-chain-verification.s3.amazonaws.com/frame1.gif",
-      "✅ Get Verified",
-      `${ATTEST_SERVER}/api/action`,
-      mainPageBody
-    )
-  );
+app.get("/", (req: Request, res: Response) => {
+  const buttons: Button[] = [{
+    text: "✅ Get Verified",
+    action: "post",
+    url: `${ATTEST_SERVER}/api/action`
+  }];
+
+  res.send(pageTemplate(
+    "https://farcaster-on-chain-verification.s3.amazonaws.com/frame1.gif",
+    "Farcaster On-Chain Verification",
+    mainPageBody,
+    buttons
+  ));
 });
 
-app.post("/refresh", (req, res) => {
-  const address = req.query.address;
+app.post("/refresh", (req: Request, res: Response) => {
+  const address = req.query.address as string;
 
-  res.send(
-    pageWithLinkFromTemplate(
-      "https://farcaster-on-chain-verification.s3.amazonaws.com/frame3.png",
-      "🏷️ Claim Stamp",
-      GITCOIN_PASSPORT_URL,
-      "👀 See Verification on EAS",
-      `${EAS_URL}/address/${address}`,
-      mainPageBody
-    )
-  );
+  const buttons: Button[] = [
+    {
+      text: "🏷️ Claim Stamp",
+      action: "link",
+      url: GITCOIN_PASSPORT_URL
+    },
+    {
+      text: "👀 See Verification on EAS",
+      action: "link",
+      url: `${EAS_URL}/address/${address}`
+    }
+  ];
+
+  res.send(pageTemplate(
+    "https://farcaster-on-chain-verification.s3.amazonaws.com/frame3.png",
+    "Claim Your Stamp",
+    mainPageBody,
+    buttons
+  ));
 });
 
 app.listen();
+
+interface Button {
+  text: string;
+  action: 'link' | 'post';
+  url: string;
+}
+
+const pageTemplate = (
+  imageUrl: string,
+  title: string,
+  body: string,
+  buttons: Button[] = []
+): string => {
+  const buttonMetaTags = buttons.map((button, index) => {
+    const buttonNumber = index + 1; // Human-readable numbering
+    return `
+      <meta property='fc:frame:button:${buttonNumber}' content='${button.text}' />
+      <meta property='fc:frame:button:${buttonNumber}:action' content='${button.action}' />
+      <meta property='fc:frame:button:${buttonNumber}:target' content='${button.url}' />
+      <meta property='fc:frame:button:${buttonNumber}:post_url' content='${button.url}' />
+    `;
+  }).join('\n');
+
+  return `
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='utf-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+    <meta name='next-size-adjust' />
+    <meta property='fc:frame' content='vNext' />
+    <meta property='fc:frame:image' content='${imageUrl}' />
+    ${buttonMetaTags}
+    <meta property='og:title' content='${title}' />
+    <meta property='og:image' content='${imageUrl}' />
+    <title>${title}</title>
+</head>
+<body>
+    ${body}
+</body>
+</html>
+  `;
+};
 
 const mainPageBody = `
     <div>
@@ -48,68 +104,4 @@ const mainPageBody = `
             Go to <a href='https://warpcast.com/gonzalomelov/0x6631596f'>Warpcast</a> and complete the steps directly on the Frame!
         </p>
     </div>
-`;
-
-let pageFromTemplate = (
-  imageUrl: string,
-  button1Text: string,
-  apiUrl: string,
-  body: string
-) => `
-<!DOCTYPE html>
-<html lang='en'>
-
-<head>
-    <meta charset='utf-8' />
-    <meta name='viewport' content='width=device-width, initial-scale=1' />
-    <meta name='next-size-adjust' />
-    <meta property='fc:frame' content='vNext' />
-    <meta property='fc:frame:image' content='${imageUrl}' />
-    <meta property='fc:frame:button:1' content='${button1Text}' />
-    <meta property='fc:frame:post_url' content='${apiUrl}' />
-    <meta property='og:title' content='Farcaster On-Chain Verification' />
-    <meta property='og:image' content='${imageUrl}' />
-    <title>Farcaster On-Chain Verification</title>
-</head>
-
-<body>
-    ${body}
-</body>
-
-</html>
-`;
-
-let pageWithLinkFromTemplate = (
-  imageUrl: string,
-  button1Text: string,
-  button1ApiUrl: string,
-  button2Text: string,
-  button2ApiUrl: string,
-  body: string
-) => `
-<!DOCTYPE html>
-<html lang='en'>
-
-<head>
-    <meta charset='utf-8' />
-    <meta name='viewport' content='width=device-width, initial-scale=1' />
-    <meta name='next-size-adjust' />
-    <meta property='fc:frame' content='vNext' />
-    <meta property='fc:frame:image' content='${imageUrl}' />
-    <meta property='fc:frame:button:1' content='${button1Text}' />
-    <meta property='fc:frame:button:1:action' content='link' />
-    <meta property='fc:frame:button:1:target' content='${button1ApiUrl}' />
-    <meta property='fc:frame:button:2' content='${button2Text}' />
-    <meta property='fc:frame:button:2:action' content='link' />
-    <meta property='fc:frame:button:2:target' content='${button2ApiUrl}' />
-    <meta property='og:title' content='Farcaster On-Chain Verification' />
-    <meta property='og:image' content='${imageUrl}' />
-    <title>Farcaster On-Chain Verification</title>
-</head>
-
-<body>
-    ${body}
-</body>
-
-</html>
 `;
