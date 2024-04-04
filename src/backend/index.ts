@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
   );
 });
 
-app.post("/refresh", async (req, res) => {
+app.post("/refresh", (req, res) => {
   const address = req.query.address;
 
   res.send(
@@ -37,7 +37,7 @@ app.post("/refresh", async (req, res) => {
 app.listen();
 
 const mainPageBody = `
-<div>
+    <div>
         <h1>
           Help build a trustful decentralized identity infrastructure ⛓️
         </h1>
