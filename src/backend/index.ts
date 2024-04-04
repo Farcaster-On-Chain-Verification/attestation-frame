@@ -69,7 +69,7 @@ const pageTemplate = (
 ): string => {
   const buttonMetaTags = buttons
     .map((button, index) => {
-      const buttonNumber = index + 1; // Human-readable numbering
+      const buttonNumber = index + 1;
       return `
       <meta property='fc:frame:button:${buttonNumber}' content='${button.text}' />
       <meta property='fc:frame:button:${buttonNumber}:action' content='${button.action}' />
