@@ -59,7 +59,7 @@ app.listen();
 const mainPageBody = `
 <div>
         <h1>
-          Help build a trustful decentralized identity infraestructure ⛓️
+          Help build a trustful decentralized identity infrastructure ⛓️
         </h1>
         <p>
           Verify your Farcaster account and claim your Gitcoin Passport stamp to improve your humanity and reputation score!
