@@ -20,38 +20,18 @@ app.get("/", (req, res) => {
 });
 
 app.post("/refresh", async (req, res) => {
-  console.log("refresh");
+  const address = req.query.address;
 
-  try {
-    const address = req.query.address;
-
-    res.send(
-      pageWithLinkFromTemplate(
-        "https://farcaster-on-chain-verification.s3.amazonaws.com/frame3.png",
-        "🏷️ Claim Stamp",
-        GITCOIN_PASSPORT_URL,
-        "👀 See Verification on EAS",
-        `${EAS_URL}/address/${address}`,
-        mainPageBody
-      )
-    );
-  } catch (err) {
-    let message = "";
-    if (typeof err === "string") {
-      message = err;
-    } else if (err instanceof Error) {
-      message = err.message;
-    }
-
-    res.send(
-      pageFromTemplate(
-        "https://ipfs.io/ipfs/QmawGYH6TdvxsC1zhMXtAPJcjy7R5yCMQ6SBmUrwGD5pNE",
-        message,
-        `https://s3afo-miaaa-aaaap-ag7da-cai.raw.icp0.io/refresh`,
-        mainPageBody
-      )
-    );
-  }
+  res.send(
+    pageWithLinkFromTemplate(
+      "https://farcaster-on-chain-verification.s3.amazonaws.com/frame3.png",
+      "🏷️ Claim Stamp",
+      GITCOIN_PASSPORT_URL,
+      "👀 See Verification on EAS",
+      `${EAS_URL}/address/${address}`,
+      mainPageBody
+    )
+  );
 });
 
 app.listen();
