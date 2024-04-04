@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response } from "express";
 
 const app = express();
 
@@ -9,18 +9,22 @@ const GITCOIN_PASSPORT_URL = "https://passport.gonzalomelov.xyz";
 app.use(express.json());
 
 app.get("/", (req: Request, res: Response) => {
-  const buttons: Button[] = [{
-    text: "✅ Get Verified",
-    action: "post",
-    url: `${ATTEST_SERVER}/api/action`
-  }];
+  const buttons: Button[] = [
+    {
+      text: "✅ Get Verified",
+      action: "post",
+      url: `${ATTEST_SERVER}/api/action`,
+    },
+  ];
 
-  res.send(pageTemplate(
-    "https://farcaster-on-chain-verification.s3.amazonaws.com/frame1.gif",
-    "Farcaster On-Chain Verification",
-    mainPageBody,
-    buttons
-  ));
+  res.send(
+    pageTemplate(
+      "https://farcaster-on-chain-verification.s3.amazonaws.com/frame1.gif",
+      "Farcaster On-Chain Verification",
+      mainPageBody,
+      buttons
+    )
+  );
 });
 
 app.post("/refresh", (req: Request, res: Response) => {
@@ -30,28 +34,30 @@ app.post("/refresh", (req: Request, res: Response) => {
     {
       text: "🏷️ Claim Stamp",
       action: "link",
-      url: GITCOIN_PASSPORT_URL
+      url: GITCOIN_PASSPORT_URL,
     },
     {
       text: "👀 See Verification on EAS",
       action: "link",
-      url: `${EAS_URL}/address/${address}`
-    }
+      url: `${EAS_URL}/address/${address}`,
+    },
   ];
 
-  res.send(pageTemplate(
-    "https://farcaster-on-chain-verification.s3.amazonaws.com/frame3.png",
-    "Claim Your Stamp",
-    mainPageBody,
-    buttons
-  ));
+  res.send(
+    pageTemplate(
+      "https://farcaster-on-chain-verification.s3.amazonaws.com/frame3.png",
+      "Claim Your Stamp",
+      mainPageBody,
+      buttons
+    )
+  );
 });
 
 app.listen();
 
 interface Button {
   text: string;
-  action: 'link' | 'post';
+  action: "link" | "post";
   url: string;
 }
 
@@ -61,15 +67,17 @@ const pageTemplate = (
   body: string,
   buttons: Button[] = []
 ): string => {
-  const buttonMetaTags = buttons.map((button, index) => {
-    const buttonNumber = index + 1; // Human-readable numbering
-    return `
+  const buttonMetaTags = buttons
+    .map((button, index) => {
+      const buttonNumber = index + 1; // Human-readable numbering
+      return `
       <meta property='fc:frame:button:${buttonNumber}' content='${button.text}' />
       <meta property='fc:frame:button:${buttonNumber}:action' content='${button.action}' />
       <meta property='fc:frame:button:${buttonNumber}:target' content='${button.url}' />
       <meta property='fc:frame:button:${buttonNumber}:post_url' content='${button.url}' />
     `;
-  }).join('\n');
+    })
+    .join("\n");
 
   return `
 <!DOCTYPE html>
