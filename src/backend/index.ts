@@ -58,16 +58,14 @@ app.listen();
 
 const mainPageBody = `
 <div>
+        <h1>
+          Help build a trustful decentralized identity infraestructure ⛓️
+        </h1>
         <p>
-            This is a Farcaster frame using Azle (<a
-                href='https://github.com/demergent-labs/azle'>https://github.com/demergent-labs/azle</a>) hosted on the
-            <a href='https://internetcomputer.org'>Internet Computer</a>.
+          Verify your Farcaster account and claim your Gitcoin Passport stamp to improve your humanity and reputation score!
         </p>
         <p>
-            <a href='https://github.com/Gekctek/farcaster-frame-azle'>
-                Github
-                (https://github.com/Gekctek/farcaster-frame-azle)
-            </a>
+            Go to <a href='https://warpcast.com/gonzalomelov/0x6631596f'>Warpcast</a> and complete the steps directly on the Frame!
         </p>
     </div>
 `;
@@ -89,9 +87,9 @@ let pageFromTemplate = (
     <meta property='fc:frame:image' content='${imageUrl}' />
     <meta property='fc:frame:button:1' content='${button1Text}' />
     <meta property='fc:frame:post_url' content='${apiUrl}' />
-    <meta property='og:title' content='Azle farcaster frame' />
+    <meta property='og:title' content='Farcaster On-Chain Verification' />
     <meta property='og:image' content='${imageUrl}' />
-    <title>Azle farcaster frame</title>
+    <title>Farcaster On-Chain Verification</title>
 </head>
 
 <body>
@@ -127,28 +125,6 @@ let pageWithLinkFromTemplate = (
     <meta property='og:title' content='Farcaster On-Chain Verification' />
     <meta property='og:image' content='${imageUrl}' />
     <title>Farcaster On-Chain Verification</title>
-</head>
-
-<body>
-    ${body}
-</body>
-
-</html>
-`;
-
-let finalFrame = (imageUrl: string, body: string) => `
-<!DOCTYPE html>
-<html lang='en'>
-
-<head>
-    <meta charset='utf-8' />
-    <meta name='viewport' content='width=device-width, initial-scale=1' />
-    <meta name='next-size-adjust' />
-    <meta property='fc:frame' content='vNext' />
-    <meta property='fc:frame:image' content='${imageUrl}' />
-    <meta property='og:title' content='Attestation Done!' />
-    <meta property='og:image' content='${imageUrl}' />
-    <title>Attestation Done!</title>
 </head>
 
 <body>
