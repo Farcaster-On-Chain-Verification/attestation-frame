@@ -30,7 +30,7 @@ app.post("/refresh", async (req, res) => {
         "https://farcaster-on-chain-verification.s3.amazonaws.com/frame3.png",
         "🏷️ Claim Stamp",
         GITCOIN_PASSPORT_URL,
-        "👀 See EAS Verification",
+        "👀 See Verification on EAS",
         `${EAS_URL}/address/${address}`,
         mainPageBody
       )
