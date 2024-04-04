@@ -3,7 +3,7 @@ import express from "express";
 const app = express();
 
 const ATTEST_SERVER = "https://attest-theta.vercel.app";
-const EAS_URL = "https://base-sepolia.easscan.org";
+const EAS_URL = "https://arbitrum.easscan.org";
 const GITCOIN_PASSPORT_URL = "https://passport.gonzalomelov.xyz";
 
 app.use(express.json());
