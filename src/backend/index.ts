@@ -19,7 +19,7 @@ app.get("/", (req: Request, res: Response) => {
 
   res.send(
     pageTemplate(
-      "https://farcaster-on-chain-verification.s3.amazonaws.com/frame1.gif",
+      "https://ipfs.io/ipfs/QmYEXPSMCpm43jT5QSYHpaoUbF37WRhMcMUKbHcu9d9P53",
       "Farcaster On-Chain Verification",
       mainPageBody,
       buttons
@@ -45,7 +45,7 @@ app.post("/refresh", (req: Request, res: Response) => {
 
   res.send(
     pageTemplate(
-      "https://farcaster-on-chain-verification.s3.amazonaws.com/frame3.png",
+      "https://ipfs.io/ipfs/Qmf2Y77Bot34s4Ciwt6r1pXKKBLMRqpvwuxW5JmRDKoDCJ",
       "Claim Your Stamp",
       mainPageBody,
       buttons
