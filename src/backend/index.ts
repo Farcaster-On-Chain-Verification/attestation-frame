@@ -3,14 +3,16 @@ import express from "express";
 const app = express();
 
 const ATTEST_SERVER = "https://attest-theta.vercel.app";
+const EAS_URL = "https://base-sepolia.easscan.org";
+const GITCOIN_PASSPORT_URL = "https://passport.gonzalomelov.xyz";
 
 app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send(
     pageFromTemplate(
-      "https://ipfs.io/ipfs/QmUF9BmteniwSsLco3XaYVGbpdh3FWuUW8CqbDP52azE65",
-      "Attest",
+      "https://farcaster-on-chain-verification.s3.amazonaws.com/frame1.gif",
+      "✅ Get Verified",
       `${ATTEST_SERVER}/api/action`,
       mainPageBody
     )
@@ -23,18 +25,13 @@ app.post("/refresh", async (req, res) => {
   try {
     const address = req.query.address;
 
-    console.log("address", address);
-
-    // const uid = req.query.uid;
-
-    // console.log('uid', uid);
-
     res.send(
       pageWithLinkFromTemplate(
-        "https://ipfs.io/ipfs/QmeJ7JRpo15yGHjPj6bjxdda1y96GEctLUXNkTTtX8MUMT",
-        "See Attestation on EAS",
-        `https://base-sepolia.easscan.org/address/${address}`,
-        // `https://base-sepolia.easscan.org/attestation/view/${uid}`,
+        "https://farcaster-on-chain-verification.s3.amazonaws.com/frame3.png",
+        "🏷️ Claim Stamp",
+        GITCOIN_PASSPORT_URL,
+        "👀 See EAS Verification",
+        `${EAS_URL}/address/${address}`,
         mainPageBody
       )
     );
@@ -107,7 +104,9 @@ let pageFromTemplate = (
 let pageWithLinkFromTemplate = (
   imageUrl: string,
   button1Text: string,
-  apiUrl: string,
+  button1ApiUrl: string,
+  button2Text: string,
+  button2ApiUrl: string,
   body: string
 ) => `
 <!DOCTYPE html>
@@ -121,10 +120,13 @@ let pageWithLinkFromTemplate = (
     <meta property='fc:frame:image' content='${imageUrl}' />
     <meta property='fc:frame:button:1' content='${button1Text}' />
     <meta property='fc:frame:button:1:action' content='link' />
-    <meta property='fc:frame:button:1:target' content='${apiUrl}' />
-    <meta property='og:title' content='Azle farcaster frame' />
+    <meta property='fc:frame:button:1:target' content='${button1ApiUrl}' />
+    <meta property='fc:frame:button:2' content='${button2Text}' />
+    <meta property='fc:frame:button:2:action' content='link' />
+    <meta property='fc:frame:button:2:target' content='${button2ApiUrl}' />
+    <meta property='og:title' content='Farcaster On-Chain Verification' />
     <meta property='og:image' content='${imageUrl}' />
-    <title>Azle farcaster frame</title>
+    <title>Farcaster On-Chain Verification</title>
 </head>
 
 <body>
