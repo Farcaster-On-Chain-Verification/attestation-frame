@@ -109,7 +109,7 @@ const mainPageBody = `
           Verify your Farcaster account and claim your Gitcoin Passport stamp to improve your humanity and reputation score!
         </p>
         <p>
-            Go to <a href='https://warpcast.com/gonzalomelov/0x6631596f'>Warpcast</a> and complete the steps directly on the Frame!
+            Go to <a href='https://warpcast.com/ceciliaeiraldi92/0x984ee840'>Warpcast</a> and complete the steps directly on the Frame!
         </p>
     </div>
 `;
