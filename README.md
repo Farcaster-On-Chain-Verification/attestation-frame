@@ -1,6 +1,6 @@
 # attestation-farcaster-frame
 
-Facilitate Farcaster account attestation through Frames using Ethereum's Attestation Service on Arbitrum One using ICP decentralized infraestructure.
+Facilitate Farcaster account attestation through Frames using Ethereum's Attestation Service on Arbitrum One.
 
 ## Motivation
 
